@@ -1,0 +1,15 @@
+.sign-in-container {
+    width: 360px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.button-container > Button {
+    margin: 10px;
+}
+
+.button-container > .black-btn {
+    background-color: black;
+}
