@@ -21,6 +21,8 @@ import {
   query,
   getDocs,
   addDoc,
+  onSnapshot,
+  updateDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -151,7 +153,8 @@ export const getProjectTasks = async(userAuth, projectId) => {
       const taskMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
         const id = docSnapshot.id;
         const { name } = docSnapshot.data();
-        acc[id] = {id, name};
+        const { isComplete } = docSnapshot.data();
+        acc[id] = {id, name, isComplete};
         return acc;
       }, {});
       return taskMap;
@@ -170,11 +173,24 @@ export const deleteProject = async(userAuth, projectId) => {
 }
 
 export const deleteProjectTask = async(userAuth, projectId, taskId) => {
-  if(!userAuth || !projectId || !taskId)
+   if(!userAuth || !projectId || !taskId) return
   try {
     await deleteDoc(doc(db, "users", userAuth.uid, "projects", projectId, "tasks", taskId))
   } catch (error) {
     console.log("Error deleting task.")
+  }
+}
+
+export const toggleIsTaskComplete = async(userAuth, projectId, taskId, isComplete) => {
+  // if(!userAuth || !projectId || !taskId) return
+  // console.log("passed");
+  const taskDocRef = doc(db, "users", userAuth.uid, "projects", projectId, "tasks", taskId); 
+  try {
+    await updateDoc(taskDocRef, {
+      isComplete: !isComplete
+    })
+  } catch (error) {
+    console.log("Failed to update task.");
   }
 }
 

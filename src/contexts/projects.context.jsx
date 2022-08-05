@@ -1,7 +1,15 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { UserContext } from "./user.context";
 
-import { getProjects } from "../utils/firebase/firebase.utils";
+import { collection, query, onSnapshot } from "firebase/firestore";
+import { db, getProjects } from "../utils/firebase/firebase.utils";
 
 export const ProjectsContext = createContext({
   projectsMap: {},
@@ -10,17 +18,28 @@ export const ProjectsContext = createContext({
 export const ProjectProvider = ({ children }) => {
   const [projectsMap, setProjectsMap] = useState({});
   const { currentUser } = useContext(UserContext);
-  const projectMap  = useRef({});
 
-
-  useEffect(() => {
-    console.log("running.")
-    const getProjectsMap = async () => {
-      projectMap.current = await getProjects(currentUser);
-      projectMap.current ? setProjectsMap(projectMap.current) : setProjectsMap({});
+  const memoizedCallback = useCallback(() => {
+    const onProjectStateChangedListener = (auth) => {
+      if (!auth) return;
+      const collectionRef = collection(db, "users", auth.uid, "projects");
+      const q = query(collectionRef);
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const getProjectsMap = async () => {
+          const projectMap = await getProjects(currentUser);
+          projectMap ? setProjectsMap(projectMap) : setProjectsMap({});
+        };
+        getProjectsMap();
+      });
+      return unsubscribe;
     };
-    getProjectsMap();
+    onProjectStateChangedListener(currentUser);
   }, [currentUser]);
+
+ useEffect(() => {
+  memoizedCallback();
+ }, [memoizedCallback])
+
 
   const value = { projectsMap };
 

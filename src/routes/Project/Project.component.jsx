@@ -1,15 +1,18 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import { UserContext } from "../../contexts/user.context";
 import { ProjectsContext } from "../../contexts/projects.context";
-import { createProjectTask, getProjectTasks } from "../../utils/firebase/firebase.utils";
+import { db, createProjectTask, getProjectTasks } from "../../utils/firebase/firebase.utils";
+import { collection, query, onSnapshot } from "firebase/firestore";
 import OutlinedCard from "../../components/cards/TaskCard.component";
+
 
 import { TextField, Button, } from "@mui/material";
 import "./project.styles.css";
 
 import "./project.styles.css";
+
 
 const Project = () => {
   const params = useParams();
@@ -28,15 +31,26 @@ const Project = () => {
       });
     }, {});
 
-  useEffect(() => { 
+    const memoizedCallback = useCallback(() => {
+      const onTaskStateChangedListener = (auth, projectId) => {
+        if (!auth) return;
+        const collectionRef = collection(db, "users", auth.uid, "projects", projectId, "tasks");
+        const q = query(collectionRef);
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const geTasksMap = async () => {
+            const taskMap = await getProjectTasks(currentUser, projectId);
+            taskMap ? setTasksMap(taskMap) : setTasksMap({});
+          };
+          geTasksMap();
+        });
+        return unsubscribe;
+      };
+      onTaskStateChangedListener(currentUser, projectId);
+    }, [currentUser, projectId]);
   
-    const getTasksMap = async () => {
-    const taskMap = await getProjectTasks(currentUser, projectId);
-    taskMap ? setTasksMap(taskMap) : setTasksMap({});
-      console.log(taskMap)
-  }; 
-       getTasksMap();
-  }, [projectId])
+   useEffect(() => {
+    memoizedCallback();
+   }, [memoizedCallback])
     
 
   const handleChange = (event) => {
@@ -68,8 +82,9 @@ const Project = () => {
     {
       tasksMap ? (Object.keys(tasksMap).map((id) => {
           const task = tasksMap[id];
+          console.log(task);
           return (
-              <OutlinedCard key={id} projectId={projectId} taskId={id} name={task.name}></OutlinedCard>
+              <OutlinedCard key={id} projectId={projectId} taskId={id} name={task.name} isComplete={task.isComplete}></OutlinedCard>
           );
         })) :
         (
