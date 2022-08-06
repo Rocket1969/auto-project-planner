@@ -25,11 +25,22 @@ const Nav = () => {
     <>
       <header className="main-head">
         <nav className="main-nav">
-          <Link to="/projects">
-            <div className="logo-container" link="/">
+          {
+            currentUser ? (
+              <Link to="/projects">
+            <div className="logo-container">
               <img src={Logo} alt="automotive project planner logo"></img>
             </div>
           </Link>
+            ) : (
+              <Link to="/auth">
+              <div className="logo-container">
+                <img src={Logo} alt="automotive project planner logo"></img>
+              </div>
+            </Link>
+            )
+          }
+          
           <div className="nav-links">
               {currentUser ? (
             <Link to="" onClick={signOutHandler}>
