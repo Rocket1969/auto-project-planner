@@ -73,7 +73,7 @@ const Project = () => {
       {project[projectId] ? <h2>{project[projectId].name}</h2> : ""}
 
       <form onSubmit={handleSubmit} className="task-form">
-        <TextField label="Project Task" onChange={handleChange} value={taskName}></TextField>
+        <TextField label="Task Name" onChange={handleChange} value={taskName}></TextField>
         <Button type="submit" variant="contained">
           Add Task
         </Button>

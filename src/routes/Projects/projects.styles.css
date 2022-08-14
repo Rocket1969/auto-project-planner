@@ -1,9 +1,7 @@
 .projects-container {
     margin-top: 1rem;
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    align-items: stretch;
-    justify-items: stretch;
 }
-

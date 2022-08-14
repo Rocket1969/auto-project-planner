@@ -38,7 +38,7 @@ export default function OutlinedCard({ id, name }) {
         <CardActions>
           <div className="button-container">
            <Button onClick={routeToProject} variant="contained" size="small">
-              View Project
+              View Tasks
             </Button> 
             <Button onClick={handleProjectDelete} variant="contained" size="small">
               Delete Project

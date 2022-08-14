@@ -4,7 +4,7 @@ import { ProjectsContext } from "../../contexts/projects.context";
 
 import OutlinedCard from "../../components/cards/ProjectCard.component";
 
-import "./projects.styles.css"
+import "./projects.styles.css";
 
 const Projects = () => {
   const { projectsMap } = useContext(ProjectsContext);
@@ -14,10 +14,10 @@ const Projects = () => {
       <h2>Projects</h2>
       <FormDialog />
       <div className="projects-container">
-           {Object.keys(projectsMap).map((id) => {
+        {Object.keys(projectsMap).map((id) => {
           const project = projectsMap[id];
           return (
-              <OutlinedCard key={id} id={id} name={project.name}></OutlinedCard>
+            <OutlinedCard  key={id} id={id} name={project.name}></OutlinedCard>
           );
         })}
       </div>
